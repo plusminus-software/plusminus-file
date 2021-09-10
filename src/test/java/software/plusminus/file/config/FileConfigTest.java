@@ -14,7 +14,7 @@ import static software.plusminus.check.Checks.check;
 @RunWith(SpringRunner.class)
 @EnableAutoConfiguration
 @SpringBootTest(classes = FileConfig.class)
-@ActiveProfiles("gitignored")
+@ActiveProfiles("test")
 public class FileConfigTest {
     
     @Autowired
