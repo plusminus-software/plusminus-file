@@ -13,9 +13,9 @@ import static software.plusminus.check.Checks.check;
 
 @RunWith(SpringRunner.class)
 @EnableAutoConfiguration
-@SpringBootTest(classes = FileConfig.class)
+@SpringBootTest(classes = FileAutoconfig.class)
 @ActiveProfiles("test")
-public class FileConfigTest {
+public class FileAutoconfigTest {
     
     @Autowired
     private FileController fileController;

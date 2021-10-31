@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-software.plusminus.file.config.FileConfig
+software.plusminus.file.config.FileAutoconfig
