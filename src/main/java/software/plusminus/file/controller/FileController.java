@@ -1,5 +1,6 @@
 package software.plusminus.file.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +20,7 @@ import java.net.URL;
 @RequestMapping("/files")
 public class FileController {
 
+    @Autowired
     private FileService service;
 
     @GetMapping("/{path}")
