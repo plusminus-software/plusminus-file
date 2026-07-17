@@ -4,21 +4,41 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>software.plusminus</groupId>
-    <artifactId>plusminus-file</artifactId>
-    <version>1.0-SNAPSHOT</version>
-
     <parent>
         <groupId>software.plusminus</groupId>
-        <artifactId>plusminus-opensource</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <artifactId>plusminus-parent</artifactId>
+        <version>1.7</version>
         <relativePath/>
     </parent>
+
+    <artifactId>plusminus-file-pom</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
 
     <name>Plusminus File</name>
     <description>Easy work with files in a Java application.</description>
     <url>https://github.com/plusminus-software/plusminus-file</url>
 
+    <modules>
+        <module>plusminus-fs</module>
+        <module>plusminus-s3</module>
+        <module>plusminus-file</module>
+    </modules>
+
+    <scm>
+        <url>https://github.com/plusminus-software/plusminus-file</url>
+        <connection>scm:git:https://github.com/plusminus-software/plusminus-file.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/plusminus-software/plusminus-file.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+    <issueManagement>
+        <system>Github Issues</system>
+        <url>https://github.com/plusminus-software/plusminus-file/issues</url>
+    </issueManagement>
+    <ciManagement>
+        <system>Github Actions</system>
+        <url>https://github.com/plusminus-software/plusminus-file/actions</url>
+    </ciManagement>
     <licenses>
         <license>
             <name>Apache License, Version 2.0</name>
@@ -26,7 +46,6 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
-
     <developers>
         <developer>
             <name>Taras Shpek</name>
@@ -38,40 +57,4 @@
             <timezone>Europe/Kyiv</timezone>
         </developer>
     </developers>
-
-    <scm>
-        <connection>scm:git:git://github.com/plusminus-software/plusminus-file.git</connection>
-        <developerConnection>scm:git:ssh://github.com:plusminus-software/plusminus-file.git</developerConnection>
-        <url>https://github.com/plusminus-software/plusminus-file/tree/main</url>
-    </scm>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>software.plusminus</groupId>
-            <artifactId>plusminus-s3</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>software.plusminus</groupId>
-            <artifactId>plusminus-fs</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-        <!-- Test -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>software.plusminus</groupId>
-            <artifactId>plusminus-check</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-
 </project>

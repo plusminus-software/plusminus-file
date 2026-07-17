@@ -1,0 +1,59 @@
+package software.plusminus.file.controller;
+
+import lombok.AllArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.AntPathMatcher;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.HandlerMapping;
+import software.plusminus.fs.service.FileService;
+
+import java.io.IOException;
+import java.net.URL;
+import java.net.URLConnection;
+import javax.servlet.http.HttpServletRequest;
+
+@ConditionalOnProperty(name = "plusminus.file.controller.enabled", matchIfMissing = true)
+@RestController
+@RequestMapping("/files")
+@AllArgsConstructor
+public class FileController {
+
+    private static final AntPathMatcher PATH_MATCHER = new AntPathMatcher();
+
+    private FileService service;
+
+    @GetMapping("/**")
+    public ResponseEntity<Resource> download(HttpServletRequest request) {
+        String filepath = extractFilepath(request);
+        String contentType = URLConnection.guessContentTypeFromName(filepath);
+        MediaType mediaType = contentType == null
+                ? MediaType.APPLICATION_OCTET_STREAM
+                : MediaType.parseMediaType(contentType);
+        return ResponseEntity.ok()
+                .contentType(mediaType)
+                .body(new InputStreamResource(service.download(filepath)));
+    }
+
+    @PostMapping("/**")
+    public URL upload(HttpServletRequest request, MultipartFile file) throws IOException {
+        String folder = extractFilepath(request);
+        String filepath = folder.isEmpty()
+                ? file.getOriginalFilename()
+                : folder + '/' + file.getOriginalFilename();
+        return service.upload(filepath, file.getInputStream(), file.getSize());
+    }
+
+    private String extractFilepath(HttpServletRequest request) {
+        String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
+        String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+        return PATH_MATCHER.extractPathWithinPattern(pattern, path);
+    }
+}
