@@ -1,4 +1,4 @@
-package software.plusminus.fs.exception;
+package software.plusminus.file.exception;
 
 public class FileException extends RuntimeException {
 

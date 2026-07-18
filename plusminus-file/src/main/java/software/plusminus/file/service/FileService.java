@@ -1,4 +1,4 @@
-package software.plusminus.fs.service;
+package software.plusminus.file.service;
 
 import java.io.InputStream;
 import java.net.URL;

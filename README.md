@@ -2,26 +2,28 @@
 Easy work with files in a Java application.
 
 ## Modules
- - **plusminus-fs** — Java filesystem abstraction (`FileService`).
- - **plusminus-s3** — S3 implementation of the abstraction, built on AWS SDK for Java v2.
- - **plusminus-file** — File controller and autoconfiguration on top of the filesystem abstraction.
+ - **plusminus-file** — base module: the `FileService` abstraction, file controller,
+   and autoconfiguration.
+ - **plusminus-s3** — S3 implementation of `FileService`, built on AWS SDK for Java v2.
+   Depends on `plusminus-file`.
 
 ## Usage
-Add `plusminus-file` together with an implementation of the abstraction
-(the implementation dependency is `optional`, so pick one explicitly):
+Add the implementation you want — the base module comes transitively:
 
 ```xml
-<dependency>
-    <groupId>software.plusminus</groupId>
-    <artifactId>plusminus-file</artifactId>
-    <version>...</version>
-</dependency>
 <dependency>
     <groupId>software.plusminus</groupId>
     <artifactId>plusminus-s3</artifactId>
     <version>...</version>
 </dependency>
 ```
+
+How the `/files` controller behaves depends on the consuming application:
+
+ - **Servlet web application** (has `spring-boot-starter-web`): the controller is registered
+   **by default**. Set `plusminus.file.controller.enabled=false` if you only want `FileService`.
+ - **Non-web application**: no controller and no web server — the web dependency is `optional`
+   and is not pulled in transitively. `FileService` works as a plain storage service.
 
 ### Endpoints
  - `GET /files/{path}` — streams the file stored under `path` (nested paths are supported).

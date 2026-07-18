@@ -17,16 +17,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>software.plusminus</groupId>
-            <artifactId>plusminus-fs</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>software.plusminus</groupId>
-            <artifactId>plusminus-s3</artifactId>
-            <version>${project.version}</version>
             <optional>true</optional>
         </dependency>
         <!-- Test -->

@@ -10,7 +10,7 @@ import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.S3ClientBuilder;
-import software.plusminus.fs.service.FileService;
+import software.plusminus.file.service.FileService;
 import software.plusminus.s3.service.S3FileService;
 
 @Configuration

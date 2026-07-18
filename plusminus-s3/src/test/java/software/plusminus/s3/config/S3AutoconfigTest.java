@@ -8,7 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.plusminus.fs.service.FileService;
+import software.plusminus.file.service.FileService;
 
 import java.util.UUID;
 

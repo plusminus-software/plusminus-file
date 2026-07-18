@@ -2,6 +2,7 @@ package software.plusminus.file.controller;
 
 import lombok.AllArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
@@ -13,13 +14,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.HandlerMapping;
-import software.plusminus.fs.service.FileService;
+import software.plusminus.file.service.FileService;
 
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
 import javax.servlet.http.HttpServletRequest;
 
+@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 @ConditionalOnProperty(name = "plusminus.file.controller.enabled", matchIfMissing = true)
 @RestController
 @RequestMapping("/files")

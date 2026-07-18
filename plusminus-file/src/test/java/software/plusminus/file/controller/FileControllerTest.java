@@ -8,7 +8,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import software.plusminus.fs.service.FileService;
+import software.plusminus.file.service.FileService;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;

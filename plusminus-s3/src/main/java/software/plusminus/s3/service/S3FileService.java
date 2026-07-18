@@ -10,7 +10,7 @@ import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
 import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.S3Object;
-import software.plusminus.fs.service.FileService;
+import software.plusminus.file.service.FileService;
 import software.plusminus.s3.config.S3Properties;
 
 import java.io.InputStream;

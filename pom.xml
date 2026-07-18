@@ -20,9 +20,8 @@
     <url>https://github.com/plusminus-software/plusminus-file</url>
 
     <modules>
-        <module>plusminus-fs</module>
-        <module>plusminus-s3</module>
         <module>plusminus-file</module>
+        <module>plusminus-s3</module>
     </modules>
 
     <scm>

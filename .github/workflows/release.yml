@@ -20,7 +20,6 @@ on:
         options:
           - ""
           - "plusminus-file"
-          - "plusminus-fs"
           - "plusminus-s3"
 
 jobs:

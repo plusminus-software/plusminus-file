@@ -16,7 +16,7 @@
     <dependencies>
         <dependency>
             <groupId>software.plusminus</groupId>
-            <artifactId>plusminus-fs</artifactId>
+            <artifactId>plusminus-file</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
