@@ -8,6 +8,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import software.plusminus.file.exception.FileNotFoundException;
 import software.plusminus.file.service.FileService;
 
 import java.io.ByteArrayInputStream;
@@ -77,5 +78,57 @@ public class FileControllerTest {
         mvc.perform(multipart("/files").file(file))
                 .andExpect(status().isOk())
                 .andExpect(content().string('"' + url.toString() + '"'));
+    }
+
+    @Test
+    public void upload_StripsUnixPathComponentsFromFilename() throws Exception {
+        URL url = new URL("https://example.com/folder/passwd");
+        MockMultipartFile file = new MockMultipartFile("file", "../../etc/passwd",
+                "text/plain", "data".getBytes(StandardCharsets.UTF_8));
+        when(service.upload(eq("folder/passwd"), any(InputStream.class), eq(4L)))
+                .thenReturn(url);
+        mvc.perform(multipart("/files/folder").file(file))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void upload_StripsWindowsPathComponentsFromFilename() throws Exception {
+        URL url = new URL("https://example.com/evil.txt");
+        MockMultipartFile file = new MockMultipartFile("file", "..\\..\\evil.txt",
+                "text/plain", "data".getBytes(StandardCharsets.UTF_8));
+        when(service.upload(eq("evil.txt"), any(InputStream.class), eq(4L)))
+                .thenReturn(url);
+        mvc.perform(multipart("/files").file(file))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void upload_ReturnsBadRequestForBlankFilename() throws Exception {
+        MockMultipartFile file = new MockMultipartFile("file", "",
+                "text/plain", "data".getBytes(StandardCharsets.UTF_8));
+        mvc.perform(multipart("/files/folder").file(file))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void upload_ReturnsBadRequestForTraversalOnlyFilename() throws Exception {
+        MockMultipartFile file = new MockMultipartFile("file", "folder/..",
+                "text/plain", "data".getBytes(StandardCharsets.UTF_8));
+        mvc.perform(multipart("/files/folder").file(file))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void upload_ReturnsBadRequestWhenFilePartMissing() throws Exception {
+        mvc.perform(multipart("/files/folder"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void download_ReturnsNotFoundWhenFileMissing() throws Exception {
+        when(service.download("folder/missing.png"))
+                .thenThrow(new FileNotFoundException("File not found: folder/missing.png"));
+        mvc.perform(get("/files/folder/missing.png"))
+                .andExpect(status().isNotFound());
     }
 }

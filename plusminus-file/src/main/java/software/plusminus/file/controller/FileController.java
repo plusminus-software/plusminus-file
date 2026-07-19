@@ -5,14 +5,18 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.AntPathMatcher;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.HandlerMapping;
 import software.plusminus.file.service.FileService;
 
@@ -45,11 +49,13 @@ public class FileController {
     }
 
     @PostMapping("/**")
-    public URL upload(HttpServletRequest request, MultipartFile file) throws IOException {
+    public URL upload(HttpServletRequest request,
+                      @RequestParam("file") MultipartFile file) throws IOException {
         String folder = extractFilepath(request);
+        String filename = sanitizeFilename(file.getOriginalFilename());
         String filepath = folder.isEmpty()
-                ? file.getOriginalFilename()
-                : folder + '/' + file.getOriginalFilename();
+                ? filename
+                : folder + '/' + filename;
         return service.upload(filepath, file.getInputStream(), file.getSize());
     }
 
@@ -57,5 +63,21 @@ public class FileController {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
         return PATH_MATCHER.extractPathWithinPattern(pattern, path);
+    }
+
+    private String sanitizeFilename(String originalFilename) {
+        if (!StringUtils.hasText(originalFilename)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Uploaded file name is required");
+        }
+        String baseName = originalFilename.replace('\\', '/');
+        int lastSlash = baseName.lastIndexOf('/');
+        if (lastSlash >= 0) {
+            baseName = baseName.substring(lastSlash + 1);
+        }
+        baseName = baseName.trim();
+        if (baseName.isEmpty() || ".".equals(baseName) || "..".equals(baseName)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid uploaded file name");
+        }
+        return baseName;
     }
 }

@@ -9,8 +9,11 @@ import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.S3Utilities;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.plusminus.file.exception.FileNotFoundException;
 import software.plusminus.s3.config.S3Properties;
 
 import java.io.ByteArrayInputStream;
@@ -51,6 +54,17 @@ public class S3FileServiceTest {
         check(request.acl()).isNull();
         check(request.contentType()).is("text/plain");
         check(request.contentLength()).is(DATA.length);
+    }
+
+    @Test(expected = FileNotFoundException.class)
+    public void download_ThrowsFileExceptionWhenKeyIsMissing() {
+        S3Properties properties = new S3Properties();
+        properties.setBucketName("bucket");
+        when(s3Client.getObject(any(GetObjectRequest.class)))
+                .thenThrow(NoSuchKeyException.builder().build());
+        S3FileService service = new S3FileService(s3Client, properties);
+
+        service.download("missing.txt");
     }
 
     private S3FileService service(boolean publicRead) {
