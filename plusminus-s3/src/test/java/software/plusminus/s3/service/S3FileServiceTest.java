@@ -10,9 +10,12 @@ import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.S3Utilities;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
 import software.amazon.awssdk.services.s3.model.NoSuchKeyException;
 import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.paginators.ListObjectsV2Iterable;
 import software.plusminus.file.exception.FileNotFoundException;
 import software.plusminus.s3.config.S3Properties;
 
@@ -65,6 +68,22 @@ public class S3FileServiceTest {
         S3FileService service = new S3FileService(s3Client, properties);
 
         service.download("missing.txt");
+    }
+
+    @Test
+    public void getAllFilePaths_AppendsTrailingDelimiterSoSiblingFoldersDoNotMatch() {
+        S3Properties properties = new S3Properties();
+        properties.setBucketName("bucket");
+        S3FileService service = new S3FileService(s3Client, properties);
+        ArgumentCaptor<ListObjectsV2Request> captor = ArgumentCaptor.forClass(ListObjectsV2Request.class);
+        when(s3Client.listObjectsV2Paginator(captor.capture()))
+                .thenAnswer(invocation -> new ListObjectsV2Iterable(s3Client, invocation.getArgument(0)));
+        when(s3Client.listObjectsV2(any(ListObjectsV2Request.class)))
+                .thenReturn(ListObjectsV2Response.builder().build());
+
+        service.getAllFilePaths("my/path");
+
+        check(captor.getValue().prefix()).is("my/path/");
     }
 
     private S3FileService service(boolean publicRead) {

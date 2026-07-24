@@ -17,6 +17,16 @@ import software.plusminus.s3.service.S3FileService;
 @EnableConfigurationProperties({AwsProperties.class, S3Properties.class})
 public class S3Autoconfig {
 
+    /**
+     * Builds the {@link S3Client}.
+     *
+     * <p>Prefer the default AWS credentials provider chain (environment variables, system
+     * properties, the {@code ~/.aws/credentials} profile, container/instance IAM roles, etc.):
+     * simply leave {@code aws.accessKey} / {@code aws.secretKey} unset and this method builds a
+     * client that resolves credentials through that chain. Static {@code aws.accessKey} /
+     * {@code aws.secretKey} properties are only wired in as an explicit opt-in, and storing them
+     * in plaintext configuration is discouraged for production.
+     */
     @ConditionalOnMissingBean(S3Client.class)
     @Bean
     public S3Client s3Client(AwsProperties properties) {

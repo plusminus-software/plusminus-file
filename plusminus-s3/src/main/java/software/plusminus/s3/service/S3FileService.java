@@ -73,10 +73,22 @@ public class S3FileService implements FileService {
     public List<String> getAllFilePaths(String folderPath) {
         ListObjectsV2Request request = ListObjectsV2Request.builder()
                 .bucket(s3Properties.getBucketName())
-                .prefix(folderPath)
+                .prefix(toFolderPrefix(folderPath))
                 .build();
         return s3Client.listObjectsV2Paginator(request).contents().stream()
                 .map(S3Object::key)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Normalizes a folder path into an S3 key prefix with a trailing delimiter so that only keys
+     * inside that folder match. Without this, prefix "my/path" would also match a sibling folder
+     * such as "my/path2". An empty/null folder path lists the whole bucket.
+     */
+    private String toFolderPrefix(String folderPath) {
+        if (folderPath == null || folderPath.isEmpty() || folderPath.endsWith("/")) {
+            return folderPath == null ? "" : folderPath;
+        }
+        return folderPath + '/';
     }
 }

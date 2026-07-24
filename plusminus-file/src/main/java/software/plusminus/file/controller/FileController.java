@@ -5,6 +5,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -38,13 +40,18 @@ public class FileController {
 
     @GetMapping("/**")
     public ResponseEntity<Resource> download(HttpServletRequest request) {
-        String filepath = extractFilepath(request);
+        String filepath = sanitizeFilepath(extractFilepath(request));
         String contentType = URLConnection.guessContentTypeFromName(filepath);
         MediaType mediaType = contentType == null
                 ? MediaType.APPLICATION_OCTET_STREAM
                 : MediaType.parseMediaType(contentType);
+        String filename = filepath.substring(filepath.lastIndexOf('/') + 1);
+        ContentDisposition disposition = ContentDisposition.builder("attachment")
+                .filename(filename)
+                .build();
         return ResponseEntity.ok()
                 .contentType(mediaType)
+                .header(HttpHeaders.CONTENT_DISPOSITION, disposition.toString())
                 .body(new InputStreamResource(service.download(filepath)));
     }
 
@@ -63,6 +70,18 @@ public class FileController {
         String pattern = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
         String path = (String) request.getAttribute(HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
         return PATH_MATCHER.extractPathWithinPattern(pattern, path);
+    }
+
+    private String sanitizeFilepath(String filepath) {
+        if (filepath.indexOf('\\') >= 0 || filepath.startsWith("/")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid file path");
+        }
+        for (String segment : filepath.split("/")) {
+            if ("..".equals(segment) || ".".equals(segment)) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid file path");
+            }
+        }
+        return filepath;
     }
 
     private String sanitizeFilename(String originalFilename) {

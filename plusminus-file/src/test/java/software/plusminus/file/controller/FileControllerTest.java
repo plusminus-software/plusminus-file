@@ -125,6 +125,12 @@ public class FileControllerTest {
     }
 
     @Test
+    public void download_ReturnsBadRequestForPathTraversal() throws Exception {
+        mvc.perform(get("/files/folder/../../etc/passwd"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     public void download_ReturnsNotFoundWhenFileMissing() throws Exception {
         when(service.download("folder/missing.png"))
                 .thenThrow(new FileNotFoundException("File not found: folder/missing.png"));
