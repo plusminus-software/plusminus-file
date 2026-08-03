@@ -13,7 +13,7 @@ import static software.plusminus.check.Checks.check;
 
 @RunWith(SpringRunner.class)
 @EnableAutoConfiguration
-@SpringBootTest(classes = FileAutoconfig.class, properties = "plusminus.file.controller.enabled=false")
+@SpringBootTest(classes = FileAutoconfig.class, properties = "file.controller.enabled=false")
 @ActiveProfiles("test")
 public class FileAutoconfigDisabledTest {
 

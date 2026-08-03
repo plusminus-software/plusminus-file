@@ -28,7 +28,7 @@ import java.net.URLConnection;
 import javax.servlet.http.HttpServletRequest;
 
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
-@ConditionalOnProperty(name = "plusminus.file.controller.enabled", matchIfMissing = true)
+@ConditionalOnProperty(name = "file.controller.enabled", matchIfMissing = true)
 @RestController
 @RequestMapping("/files")
 @AllArgsConstructor

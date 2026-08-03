@@ -21,7 +21,7 @@ Add the implementation you want — the base module comes transitively:
 How the `/files` controller behaves depends on the consuming application:
 
  - **Servlet web application** (has `spring-boot-starter-web`): the controller is registered
-   **by default**. Set `plusminus.file.controller.enabled=false` if you only want `FileService`.
+   **by default**. Set `file.controller.enabled=false` if you only want `FileService`.
  - **Non-web application**: no controller and no web server — the web dependency is `optional`
    and is not pulled in transitively. `FileService` works as a plain storage service.
 
@@ -33,7 +33,7 @@ How the `/files` controller behaves depends on the consuming application:
 ## Configuration
 | Property | Default | Description |
 |---|---|---|
-| `plusminus.file.controller.enabled` | `true` | Registers the `/files` controller; set to `false` to switch it off. |
+| `file.controller.enabled` | `true` | Registers the `/files` controller; set to `false` to switch it off. |
 | `s3.bucketName` | — | Bucket used by `S3FileService` (required). |
 | `s3.publicRead` | `false` | If `true`, uploads get the `public-read` canned ACL. Requires ACLs to be enabled on the bucket. |
 | `aws.region` | — | Region; if empty, the AWS default region provider chain is used. |
