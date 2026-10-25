@@ -13,8 +13,8 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.testcontainers.containers.MinIOContainer;
-import org.testcontainers.utility.DockerImageName;
+import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.wait.strategy.Wait;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.ResponseInputStream;
@@ -46,7 +46,7 @@ import static software.plusminus.check.Checks.check;
 @RunWith(SpringRunner.class)
 @EnableAutoConfiguration
 @SpringBootTest(classes = S3Autoconfig.class)
-@ContextConfiguration(initializers = S3FileServiceIntegrationTest.MinioInitializer.class)
+@ContextConfiguration(initializers = S3FileServiceIntegrationTest.S3MockInitializer.class)
 @ActiveProfiles("test")
 @SuppressWarnings("PMD.CloseResource")
 public class S3FileServiceIntegrationTest {
@@ -56,8 +56,10 @@ public class S3FileServiceIntegrationTest {
     private static final String BUCKET = "plusminus-test";
     private static final String REGION = "eu-central-1";
 
-    private static final MinIOContainer MINIO = new MinIOContainer(
-            DockerImageName.parse("minio/minio:RELEASE.2023-09-04T19-57-37Z"));
+    private static final int S3_MOCK_PORT = 9090;
+    private static final GenericContainer<?> S3_MOCK = new GenericContainer<>("adobe/s3mock:3.11.0")
+            .withExposedPorts(S3_MOCK_PORT)
+            .waitingFor(Wait.forListeningPort());
 
     @Autowired
     private S3FileService s3FileService;
@@ -66,12 +68,12 @@ public class S3FileServiceIntegrationTest {
 
     @BeforeClass
     public static void beforeClass() {
-        MINIO.start();
+        S3_MOCK.start();
     }
 
     @AfterClass
     public static void afterClass() {
-        MINIO.stop();
+        S3_MOCK.stop();
     }
 
     @After
@@ -122,7 +124,7 @@ public class S3FileServiceIntegrationTest {
 
         URL url = s3FileService.upload(filepath, inputStream, DATA.length);
 
-        check(url.toString()).is(MINIO.getS3URL() + '/' + BUCKET + '/' + filepath);
+        check(url.toString()).is(s3MockUrl() + '/' + BUCKET + '/' + filepath);
     }
 
     @Test
@@ -185,16 +187,20 @@ public class S3FileServiceIntegrationTest {
                 .collect(Collectors.toList());
     }
 
-    static class MinioInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
+    private static String s3MockUrl() {
+        return "http://" + S3_MOCK.getHost() + ":" + S3_MOCK.getMappedPort(S3_MOCK_PORT);
+    }
+
+    static class S3MockInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
         @Override
         public void initialize(ConfigurableApplicationContext applicationContext) {
             S3Client s3Client = S3Client.builder()
-                    .endpointOverride(URI.create(MINIO.getS3URL()))
+                    .endpointOverride(URI.create(s3MockUrl()))
                     .region(Region.of(REGION))
                     .forcePathStyle(true)
                     .credentialsProvider(StaticCredentialsProvider.create(
-                            AwsBasicCredentials.create(MINIO.getUserName(), MINIO.getPassword())))
+                            AwsBasicCredentials.create("accessKey", "secretKey")))
                     .build();
             try {
                 s3Client.headBucket(HeadBucketRequest.builder().bucket(BUCKET).build());

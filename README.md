@@ -48,7 +48,7 @@ configuring `spring.servlet.multipart.max-file-size`.
 
 ## Test running
 The `plusminus-s3` integration tests spin up a local, S3-compatible
-[MinIO](https://min.io/) server via [Testcontainers](https://testcontainers.com/),
+[Adobe S3Mock](https://github.com/adobe/S3Mock) server via [Testcontainers](https://testcontainers.com/),
 so no AWS account is needed — just a running Docker daemon on the machine (or CI runner).
 
 ## Building
